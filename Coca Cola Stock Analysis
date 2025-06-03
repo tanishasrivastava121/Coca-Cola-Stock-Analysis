@@ -1,0 +1,140 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+df = pd.read_csv("/kaggle/input/coca-cola-data-set-123/Coca-Cola_stock_history.csv")
+data = pd.read_csv("/kaggle/input/coca-cola-data-set-123/Copy of Coca-Cola_stock_info.csv")
+df.head()
+data.head()
+df.tail()
+data.tail()
+df.info()
+df.describe()
+data.info()
+data.describe()
+df.shape
+data.shape
+# Check for missing value
+df.isnull().sum()
+data.isnull().sum()
+# Forward fill for stock data continuity
+data.fillna(0, inplace = True) 
+df.fillna(0, inplace = True)
+# Confirm no missing values remain
+print(data.isnull().sum())
+# 1.Simple Box Plot Using Seaborn
+plt.figure(figsize=(8, 5))
+sns.boxplot(y=df['Close'])  # Just one variable (y-axis)
+plt.title('Boxplot of Closing Prices')
+plt.ylabel('Close Price')
+plt.show()
+# 2.Correlation Heatmap Between Numerical Features
+sns.heatmap(df[['Open', 'High', 'Low', 'Close', 'Volume']].corr(), annot=True, cmap='coolwarm')
+plt.title('Correlation Heatmap')
+plt.tight_layout()
+plt.show()
+# 3.Line Plot – Close Price Over Time
+import matplotlib.pyplot as plt
+plt.figure(figsize=(12, 5))
+plt.plot(df['Date'], df['Close'], color='blue')
+plt.title('Coca-Cola Stock Close Price Over Time')
+plt.xlabel('Date')
+plt.ylabel('Close Price')
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+# 4. Histogram – Daily Returns
+plt.figure(figsize=(8, 5))
+sns.histplot(df['Daily_Return'], kde=True, color='teal', bins=50)
+plt.title('Distribution of Daily Returns')
+plt.xlabel('Daily Return')
+plt.ylabel('Frequency')
+plt.show()
+# 5.Pie Chart of Target Values (0 or 1)
+# Value counts of 'Target' column
+target_counts = df['Target'].value_counts()
+
+# Labels and values
+labels = target_counts.index
+sizes = target_counts.values
+
+# Plot
+plt.figure(figsize=(5,5))
+plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90, colors=['#66b3ff', '#ff9999'])
+plt.title('Distribution of Target Variable (0 = Down, 1 = Up)')
+plt.axis('equal')  # Equal aspect ratio ensures it's a perfect circle
+plt.show()
+# 6. Line Plot with Multiple Lines (e.g. MA_7 and MA_30)
+plt.figure(figsize=(12, 6))
+
+plt.plot(df['Date'], df['Close'], label='Close', color='blue')
+plt.plot(df['Date'], df['MA_7'], label='MA 7', color='orange')
+plt.plot(df['Date'], df['MA_30'], label='MA 30', color='green')
+
+plt.title('Stock Price with Moving Averages', fontsize=14)
+plt.xlabel('Date')
+plt.ylabel('Price')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+# 7.Count Plot – Target Variable Count (Up vs Down Days)
+sns.countplot(x='Target', data=df)
+plt.title('Number of Up vs Down Days')
+plt.xlabel('Target (1 = Up, 0 = Down)')
+plt.ylabel('Count')
+plt.show()
+# 8. Line Plot: Trading Volume Over Time
+plt.figure(figsize=(12, 5))
+plt.plot(df['Date'], df['Volume'], color='brown')
+plt.title('Trading Volume Over Time')
+plt.xlabel('Date')
+plt.ylabel('Volume')
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+# predictive analysis 
+
+# 1.Select features
+features = ['Open', 'High', 'Low', 'Close', 'Volume', 'Daily_Return', 'MA_7', 'MA_30', 'Lag_1']
+df_model = df[features + ['Target']].dropna()
+
+# 2.Train-Test-Split
+from sklearn.model_selection import train_test_split
+X = df_model[features]
+y = df_model['Target']
+X_train, X_test, y_train, y_test = train_test_split(X, y, shuffle=False, test_size=0.2)
+
+# 3. Train A model
+from sklearn.ensemble import RandomForestClassifier
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+
+# 4. Evaluate the model
+from sklearn.metrics import classification_report, accuracy_score
+y_pred = model.predict(X_test)
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print(classification_report(y_test, y_pred))
+
+# predictive analysis 
+
+# 1.Select features
+features = ['Open', 'High', 'Low', 'Close', 'Volume', 'Daily_Return', 'MA_7', 'MA_30', 'Lag_1']
+df_model = df[features + ['Target']].dropna()
+
+# 2.Train-Test-Split
+from sklearn.model_selection import train_test_split
+X = df_model[features]
+y = df_model['Target']
+X_train, X_test, y_train, y_test = train_test_split(X, y, shuffle=False, test_size=0.2)
+
+# 3. Train A model
+from sklearn.ensemble import RandomForestClassifier
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+
+# 4. Evaluate the model
+from sklearn.metrics import classification_report, accuracy_score
+y_pred = model.predict(X_test)
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print(classification_report(y_test, y_pred))
